@@ -56,10 +56,10 @@ const char *record_sinks_install_defaults(void)
         record_sink_register(ble);
     }
 
-    record_sink_t *file = record_sink_file_create();
-    if (file != NULL) {
-        record_sink_register(file);
-        return (const char *)file->priv;  /* mount point or NULL */
-    }
+    // record_sink_t *file = record_sink_file_create();
+    // if (file != NULL) {
+        // record_sink_register(file);
+        // return (const char *)file->priv;  /* mount point or NULL */
+    // }
     return NULL;
 }

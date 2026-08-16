@@ -28,21 +28,21 @@
 #include "aircraft_state.h"
 #include "gps.h"
 #include "ble_gatt.h"
-#include "boot_splash.h"
-#include "button_task.h"
-#include "config_qnh.h"
+//#include "boot_splash.h"
+//#include "button_task.h"
+//#include "config_qnh.h"
 #include "config_storage.h"
 #include "config_traffic.h"
-#include "pk_sdcard.h"
-#include "display.h"
-#include "imu_task.h"
-#include "baro.h"
+//#include "pk_sdcard.h"
+//#include "display.h"
+//#include "imu_task.h"
+//#include "baro.h"
 #include "i18n.h"
-#include "pfd.h"
+//#include "pfd.h"
 #include "power.h"
-#include "record_sink.h"
-#include "settings_page.h"
-#include "ui_state.h"
+//#include "record_sink.h"
+//#include "settings_page.h"
+//#include "ui_state.h"
 
 static const char *TAG = "pilot_kit";
 
@@ -79,156 +79,156 @@ RingbufHandle_t g_iq_ringbuf = NULL;
  * jumps back to the PFD. Long and very-long TARE still do their IMU
  * actions in any mode.
  */
-static void on_button_event(pk_button_id_t id, pk_button_event_t evt)
-{
-    switch (id) {
-    case PK_BTN_TARE:
-        if (evt == PK_BTN_EVT_SHORT_PRESS) {
-            pk_ui_mode_t mode = pk_ui_get_mode();
-            if (mode == PK_UI_MODE_SETTINGS) {
-                /* TARE 短按:切换选中行(Language <-> QNH) */
-                pk_settings_cursor_next();
-            } else if (mode == PK_UI_MODE_ADSB_LIST) {
-                /* Bind / de-select the highlighted aircraft as own-ship.
-                 * ui_state tracks the highlight by ICAO, so we just read
-                 * whichever ICAO the list renderer last committed —
-                 * sel_icao == 0 means the user hasn't scrolled yet OR
-                 * the previously-highlighted aircraft dropped out of the
-                 * 60s window without being replaced.
-                 *   - Pressing TARE on the already-bound aircraft TOGGLES
-                 *     the binding off (de-select) and stays in the list.
-                 *   - Binding a different aircraft sets it and jumps back
-                 *     to PFD so the pilot immediately sees the caged
-                 *     horizon sourced from the fresh transponder.
-                 * Both actions raise a toast for visual confirmation. */
-                uint32_t sel_icao = pk_ui_list_get_selected_icao();
-                if (sel_icao == 0) {
-                    ESP_LOGW(TAG, "TARE in ADSB list: no aircraft "
-                                  "highlighted yet — binding skipped");
-                } else if (pk_ui_get_own_icao() == sel_icao) {
-                    pk_ui_clear_own_icao();
-                    pk_ui_toast_show(PK_TR_TOAST_OWN_CLEARED, false);
-                } else {
-                    pk_ui_set_own_icao(sel_icao);
-                    pk_ui_toast_show(PK_TR_TOAST_OWN_BOUND, false);
-                    pk_ui_set_mode(PK_UI_MODE_PFD);
-                }
-            } else {
-                (void)pk_imu_tare_now();
-            }
-        } else if (evt == PK_BTN_EVT_LONG_PRESS) {
-            /* 长按保存:把当前 tare 偏移写入 NVS。弹 toast 反馈成功/失败,
-             * 否则用户无从知道这一次按压到底有没有落盘。 */
-            esp_err_t e = pk_imu_tare_persist();
-            pk_ui_toast_show(e == ESP_OK ? PK_TR_TOAST_TARE_SAVED
-                                         : PK_TR_TOAST_TARE_SAVE_FAIL,
-                             e != ESP_OK);
-        } else if (evt == PK_BTN_EVT_VERY_LONG_PRESS) {
-            (void)pk_imu_factory_reset();
-        }
-        break;
+// static void on_button_event(pk_button_id_t id, pk_button_event_t evt)
+// {
+    // switch (id) {
+    // case PK_BTN_TARE:
+        // if (evt == PK_BTN_EVT_SHORT_PRESS) {
+            // pk_ui_mode_t mode = pk_ui_get_mode();
+            // if (mode == PK_UI_MODE_SETTINGS) {
+                // /* TARE 短按:切换选中行(Language <-> QNH) */
+                // pk_settings_cursor_next();
+            // } else if (mode == PK_UI_MODE_ADSB_LIST) {
+                // /* Bind / de-select the highlighted aircraft as own-ship.
+                 // * ui_state tracks the highlight by ICAO, so we just read
+                 // * whichever ICAO the list renderer last committed —
+                 // * sel_icao == 0 means the user hasn't scrolled yet OR
+                 // * the previously-highlighted aircraft dropped out of the
+                 // * 60s window without being replaced.
+                 // *   - Pressing TARE on the already-bound aircraft TOGGLES
+                 // *     the binding off (de-select) and stays in the list.
+                 // *   - Binding a different aircraft sets it and jumps back
+                 // *     to PFD so the pilot immediately sees the caged
+                 // *     horizon sourced from the fresh transponder.
+                 // * Both actions raise a toast for visual confirmation. */
+                // uint32_t sel_icao = pk_ui_list_get_selected_icao();
+                // if (sel_icao == 0) {
+                    // ESP_LOGW(TAG, "TARE in ADSB list: no aircraft "
+                                  // "highlighted yet — binding skipped");
+                // } else if (pk_ui_get_own_icao() == sel_icao) {
+                    // pk_ui_clear_own_icao();
+                    // pk_ui_toast_show(PK_TR_TOAST_OWN_CLEARED, false);
+                // } else {
+                    // pk_ui_set_own_icao(sel_icao);
+                    // pk_ui_toast_show(PK_TR_TOAST_OWN_BOUND, false);
+                    // pk_ui_set_mode(PK_UI_MODE_PFD);
+                // }
+            // } else {
+                // (void)pk_imu_tare_now();
+            // }
+        // } else if (evt == PK_BTN_EVT_LONG_PRESS) {
+            // /* 长按保存:把当前 tare 偏移写入 NVS。弹 toast 反馈成功/失败,
+             // * 否则用户无从知道这一次按压到底有没有落盘。 */
+            // esp_err_t e = pk_imu_tare_persist();
+            // pk_ui_toast_show(e == ESP_OK ? PK_TR_TOAST_TARE_SAVED
+                                         // : PK_TR_TOAST_TARE_SAVE_FAIL,
+                             // e != ESP_OK);
+        // } else if (evt == PK_BTN_EVT_VERY_LONG_PRESS) {
+            // (void)pk_imu_factory_reset();
+        // }
+        // break;
 
-    case PK_BTN_MODE:
-        if (evt == PK_BTN_EVT_SHORT_PRESS) {
-            pk_ui_toggle_mode();
-        } else if (evt == PK_BTN_EVT_LONG_PRESS) {
-            /* Soft power-off: drop backlight, configure GPIO5 as the
-             * deep-sleep wake GPIO, enter deep sleep. Does not return — next
-             * press of MODE is a cold boot. */
-            pk_power_enter_sleep();
-        }
-        break;
+    // case PK_BTN_MODE:
+        // if (evt == PK_BTN_EVT_SHORT_PRESS) {
+            // pk_ui_toggle_mode();
+        // } else if (evt == PK_BTN_EVT_LONG_PRESS) {
+            // /* Soft power-off: drop backlight, configure GPIO5 as the
+             // * deep-sleep wake GPIO, enter deep sleep. Does not return — next
+             // * press of MODE is a cold boot. */
+            // pk_power_enter_sleep();
+        // }
+        // break;
 
-    case PK_BTN_UP:
-        if (evt == PK_BTN_EVT_SHORT_PRESS) {
-            pk_ui_mode_t mode = pk_ui_get_mode();
-            if (mode == PK_UI_MODE_SETTINGS) {
-                int row = pk_settings_cursor_row();
-                if (row == 1) {
-                    /* QNH 行:UP +0.25 hPa */
-                    pk_qnh_set(pk_qnh_get() + 0.25f);
-                } else if (row == 2) {
-                    /* MAP 行:切换地图朝向 */
-                    pk_map_orient_set(pk_map_orient_get() == PK_MAP_NORTH_UP
-                                          ? PK_MAP_HEADING_UP : PK_MAP_NORTH_UP);
-                } else if (row == 3) {
-                    /* RANGE 行:UP 量程加一档 */
-                    pk_traffic_range_idx_set(pk_traffic_range_idx_get() + 1);
-                } else if (row == 4) {
-                    /* LOG 行:切换日志存储位置(flash <-> microSD,重启生效) */
-                    pk_log_store_set(pk_log_store_get() == PK_LOG_STORE_SD
-                                         ? PK_LOG_STORE_FLASH : PK_LOG_STORE_SD);
-                } else if (row == 5) {
-                    /* FORMAT SD 行:两步确认格式化 */
-                    pk_settings_format_action();
-                } else {
-                    /* Language 行:切语言 */
-                    esp_err_t err = pk_i18n_toggle_lang();
-                    if (err != ESP_OK) {
-                        ESP_LOGW(TAG, "language toggle failed (%s)",
-                                 esp_err_to_name(err));
-                    }
-                }
-            } else if (mode == PK_UI_MODE_ADSB_LIST || mode == PK_UI_MODE_TRAFFIC) {
-                pk_ui_list_scroll(-1);   /* 雷达页与列表共用按 ICAO 跟踪的选中 */
-            } else if (mode == PK_UI_MODE_ABOUT) {
-                pk_ui_about_scroll(-1);
-            } else if (mode == PK_UI_MODE_DIAG) {
-                pk_ui_diag_scroll(-1);
-            }
-        } else if (evt == PK_BTN_EVT_COMBO_BLE_PAIR) {
-            /* BLE pairing request gesture is verified in firmware.
-             * Mobile UI handling is intentionally left for the client
-             * integration layer. */
-            ESP_LOGW(TAG, "UP+DOWN combo: BLE pairing requested "
-                          "(mobile UI handling not implemented yet)");
-        }
-        break;
+    // case PK_BTN_UP:
+        // if (evt == PK_BTN_EVT_SHORT_PRESS) {
+            // pk_ui_mode_t mode = pk_ui_get_mode();
+            // if (mode == PK_UI_MODE_SETTINGS) {
+                // int row = pk_settings_cursor_row();
+                // if (row == 1) {
+                    // /* QNH 行:UP +0.25 hPa */
+                    // pk_qnh_set(pk_qnh_get() + 0.25f);
+                // } else if (row == 2) {
+                    // /* MAP 行:切换地图朝向 */
+                    // pk_map_orient_set(pk_map_orient_get() == PK_MAP_NORTH_UP
+                                          // ? PK_MAP_HEADING_UP : PK_MAP_NORTH_UP);
+                // } else if (row == 3) {
+                    // /* RANGE 行:UP 量程加一档 */
+                    // pk_traffic_range_idx_set(pk_traffic_range_idx_get() + 1);
+                // } else if (row == 4) {
+                    // /* LOG 行:切换日志存储位置(flash <-> microSD,重启生效) */
+                    // pk_log_store_set(pk_log_store_get() == PK_LOG_STORE_SD
+                                         // ? PK_LOG_STORE_FLASH : PK_LOG_STORE_SD);
+                // } else if (row == 5) {
+                    // /* FORMAT SD 行:两步确认格式化 */
+                    // pk_settings_format_action();
+                // } else {
+                    // /* Language 行:切语言 */
+                    // esp_err_t err = pk_i18n_toggle_lang();
+                    // if (err != ESP_OK) {
+                        // ESP_LOGW(TAG, "language toggle failed (%s)",
+                                 // esp_err_to_name(err));
+                    // }
+                // }
+            // } else if (mode == PK_UI_MODE_ADSB_LIST || mode == PK_UI_MODE_TRAFFIC) {
+                // pk_ui_list_scroll(-1);   /* 雷达页与列表共用按 ICAO 跟踪的选中 */
+            // } else if (mode == PK_UI_MODE_ABOUT) {
+                // pk_ui_about_scroll(-1);
+            // } else if (mode == PK_UI_MODE_DIAG) {
+                // pk_ui_diag_scroll(-1);
+            // }
+        // } else if (evt == PK_BTN_EVT_COMBO_BLE_PAIR) {
+            // /* BLE pairing request gesture is verified in firmware.
+             // * Mobile UI handling is intentionally left for the client
+             // * integration layer. */
+            // ESP_LOGW(TAG, "UP+DOWN combo: BLE pairing requested "
+                          // "(mobile UI handling not implemented yet)");
+        // }
+        // break;
 
-    case PK_BTN_DOWN:
-        if (evt == PK_BTN_EVT_SHORT_PRESS) {
-            pk_ui_mode_t mode = pk_ui_get_mode();
-            if (mode == PK_UI_MODE_SETTINGS) {
-                int row = pk_settings_cursor_row();
-                if (row == 1) {
-                    /* QNH 行:DOWN -0.25 hPa */
-                    pk_qnh_set(pk_qnh_get() - 0.25f);
-                } else if (row == 2) {
-                    /* MAP 行:切换地图朝向 */
-                    pk_map_orient_set(pk_map_orient_get() == PK_MAP_NORTH_UP
-                                          ? PK_MAP_HEADING_UP : PK_MAP_NORTH_UP);
-                } else if (row == 3) {
-                    /* RANGE 行:DOWN 量程减一档 */
-                    pk_traffic_range_idx_set(pk_traffic_range_idx_get() - 1);
-                } else if (row == 4) {
-                    /* LOG 行:切换日志存储位置(flash <-> microSD,重启生效) */
-                    pk_log_store_set(pk_log_store_get() == PK_LOG_STORE_SD
-                                         ? PK_LOG_STORE_FLASH : PK_LOG_STORE_SD);
-                } else if (row == 5) {
-                    /* FORMAT SD 行:两步确认格式化 */
-                    pk_settings_format_action();
-                } else {
-                    /* Language 行:切语言 */
-                    esp_err_t err = pk_i18n_toggle_lang();
-                    if (err != ESP_OK) {
-                        ESP_LOGW(TAG, "language toggle failed (%s)",
-                                 esp_err_to_name(err));
-                    }
-                }
-            } else if (mode == PK_UI_MODE_ADSB_LIST || mode == PK_UI_MODE_TRAFFIC) {
-                pk_ui_list_scroll(+1);   /* 雷达页与列表共用按 ICAO 跟踪的选中 */
-            } else if (mode == PK_UI_MODE_ABOUT) {
-                pk_ui_about_scroll(+1);
-            } else if (mode == PK_UI_MODE_DIAG) {
-                pk_ui_diag_scroll(+1);
-            }
-        }
-        break;
+    // case PK_BTN_DOWN:
+        // if (evt == PK_BTN_EVT_SHORT_PRESS) {
+            // pk_ui_mode_t mode = pk_ui_get_mode();
+            // if (mode == PK_UI_MODE_SETTINGS) {
+                // int row = pk_settings_cursor_row();
+                // if (row == 1) {
+                    // /* QNH 行:DOWN -0.25 hPa */
+                    // pk_qnh_set(pk_qnh_get() - 0.25f);
+                // } else if (row == 2) {
+                    // /* MAP 行:切换地图朝向 */
+                    // pk_map_orient_set(pk_map_orient_get() == PK_MAP_NORTH_UP
+                                          // ? PK_MAP_HEADING_UP : PK_MAP_NORTH_UP);
+                // } else if (row == 3) {
+                    // /* RANGE 行:DOWN 量程减一档 */
+                    // pk_traffic_range_idx_set(pk_traffic_range_idx_get() - 1);
+                // } else if (row == 4) {
+                    // /* LOG 行:切换日志存储位置(flash <-> microSD,重启生效) */
+                    // pk_log_store_set(pk_log_store_get() == PK_LOG_STORE_SD
+                                         // ? PK_LOG_STORE_FLASH : PK_LOG_STORE_SD);
+                // } else if (row == 5) {
+                    // /* FORMAT SD 行:两步确认格式化 */
+                    // pk_settings_format_action();
+                // } else {
+                    // /* Language 行:切语言 */
+                    // esp_err_t err = pk_i18n_toggle_lang();
+                    // if (err != ESP_OK) {
+                        // ESP_LOGW(TAG, "language toggle failed (%s)",
+                                 // esp_err_to_name(err));
+                    // }
+                // }
+            // } else if (mode == PK_UI_MODE_ADSB_LIST || mode == PK_UI_MODE_TRAFFIC) {
+                // pk_ui_list_scroll(+1);   /* 雷达页与列表共用按 ICAO 跟踪的选中 */
+            // } else if (mode == PK_UI_MODE_ABOUT) {
+                // pk_ui_about_scroll(+1);
+            // } else if (mode == PK_UI_MODE_DIAG) {
+                // pk_ui_diag_scroll(+1);
+            // }
+        // }
+        // break;
 
-    default:
-        break;
-    }
-}
+    // default:
+        // break;
+    // }
+// }
 
 void usb_host_lib_task(void *arg)
 {
@@ -310,15 +310,15 @@ void app_main(void)
      * register even if BLE never comes up. */
     /* microSD 探测 + 日志存储位置设置必须先于 file sink 创建：
      * record_sink_file_create() 据此决定写 flash LittleFS 还是 /sdcard。 */
-    pk_config_storage_load();
-    pk_sdcard_init();
+    // pk_config_storage_load();
+    // pk_sdcard_init();
 
     const char *file_mount = record_sinks_install_defaults();
     if (file_mount != NULL) {
-        ESP_LOGI(TAG, "ADS-B sinks ready (UART + file at %s)", file_mount);
-    } else {
-        ESP_LOGW(TAG, "ADS-B file sink unavailable — UART sink only");
-    }
+        ESP_LOGI(TAG, "ADS-B sinks ready (UART)", file_mount);
+     } //else {
+        // ESP_LOGW(TAG, "ADS-B file sink unavailable — UART sink only");
+    // }
 
     ok = xTaskCreatePinnedToCore(sdr_task, "sdr", 8192, NULL, 6, NULL, 1);
     assert(ok == pdTRUE);
@@ -334,54 +334,54 @@ void app_main(void)
      * quickly. Init work (IMU/UI/buttons/BLE/SDR) happens during the
      * visible splash window and counts against the hold, so we only
      * sleep if init was faster than the target. */
-    esp_err_t lcd_err = pk_display_init();
-    int64_t splash_shown_us = 0;
-    if (lcd_err != ESP_OK) {
-        ESP_LOGW(TAG, "display init failed (%s) — running headless",
-                 esp_err_to_name(lcd_err));
-    } else {
-        pk_boot_splash_render(pk_display_framebuffer());
-        (void)pk_display_flush_full();
-        pk_display_set_brightness(180);
-        splash_shown_us = esp_timer_get_time();
-    }
+    // esp_err_t lcd_err = pk_display_init();
+    // int64_t splash_shown_us = 0;
+    // if (lcd_err != ESP_OK) {
+        // ESP_LOGW(TAG, "display init failed (%s) — running headless",
+                 // esp_err_to_name(lcd_err));
+    // } else {
+        // pk_boot_splash_render(pk_display_framebuffer());
+        // (void)pk_display_flush_full();
+        // pk_display_set_brightness(180);
+        // splash_shown_us = esp_timer_get_time();
+    // }
 
     /* BNO085 IMU. Failure is non-fatal — the rest of the
      * firmware (RTL-SDR, BLE, storage) keeps working without attitude. */
-    esp_err_t imu_err = pk_imu_init();
-    if (imu_err != ESP_OK) {
-        ESP_LOGW(TAG, "IMU init failed (%s) — PFD will run without attitude",
-                 esp_err_to_name(imu_err));
-    } else {
-        ESP_LOGI(TAG, "BNO085 IMU online");
-    }
-    pk_qnh_load();     /* 从 NVS 加载 QNH,供 baro_task 立即使用 */
+    // esp_err_t imu_err = pk_imu_init();
+    // if (imu_err != ESP_OK) {
+        // ESP_LOGW(TAG, "IMU init failed (%s) — PFD will run without attitude",
+                 // esp_err_to_name(imu_err));
+    // } else {
+        // ESP_LOGI(TAG, "BNO085 IMU online");
+    // }
+    // pk_qnh_load();     /* 从 NVS 加载 QNH,供 baro_task 立即使用 */
     pk_config_traffic_load();  /* 从 NVS 加载地图朝向 + 雷达量程 */
-    pk_baro_start();   /* BMP388 on shared I²C0 */
+    // pk_baro_start();   /* BMP388 on shared I²C0 */
 
     /* UI state lives in its own module so the button callback can flip
      * the mode without touching the render task directly. Default mode
      * is PFD; survives an IMU-init failure (you can still scroll the
      * ADS-B list with no attitude). */
-    esp_err_t ui_err = pk_ui_init();
-    if (ui_err != ESP_OK) {
-        ESP_LOGW(TAG, "ui_state init failed (%s)", esp_err_to_name(ui_err));
-    }
+    // esp_err_t ui_err = pk_ui_init();
+    // if (ui_err != ESP_OK) {
+        // ESP_LOGW(TAG, "ui_state init failed (%s)", esp_err_to_name(ui_err));
+    // }
 
-    esp_err_t i18n_err = pk_i18n_init();
-    if (i18n_err != ESP_OK) {
-        ESP_LOGW(TAG, "i18n init failed (%s) — default language remains English",
-                 esp_err_to_name(i18n_err));
-    }
+    // esp_err_t i18n_err = pk_i18n_init();
+    // if (i18n_err != ESP_OK) {
+        // ESP_LOGW(TAG, "i18n init failed (%s) — default language remains English",
+                 // esp_err_to_name(i18n_err));
+    // }
 
-    /* Tact buttons: TARE/MODE/UP/DOWN on GPIO 26/5/22/23. Spawned
-     * even when IMU init failed — only the TARE button does anything
-     * without an IMU (no-ops out, harmless), and MODE/UP/DOWN still
-     * drive the UI. */
-    esp_err_t btn_err = pk_button_init(on_button_event);
-    if (btn_err != ESP_OK) {
-        ESP_LOGW(TAG, "button init failed (%s)", esp_err_to_name(btn_err));
-    }
+    // /* Tact buttons: TARE/MODE/UP/DOWN on GPIO 26/5/22/23. Spawned
+     // * even when IMU init failed — only the TARE button does anything
+     // * without an IMU (no-ops out, harmless), and MODE/UP/DOWN still
+     // * drive the UI. */
+    // esp_err_t btn_err = pk_button_init(on_button_event);
+    // if (btn_err != ESP_OK) {
+        // ESP_LOGW(TAG, "button init failed (%s)", esp_err_to_name(btn_err));
+    // }
 
     /* PFD render task. Starts after the display + IMU init
      * so it can read both straight away. Survives either failing.
@@ -390,29 +390,29 @@ void app_main(void)
      * has been visible for at least PK_BOOT_SPLASH_MIN_MS. Init work
      * above has already used some of that budget; we only sleep for
      * the remainder. */
-    if (lcd_err == ESP_OK) {
-        const int64_t splash_min_ms = PK_BOOT_SPLASH_MIN_MS;
-        int64_t elapsed_ms = (esp_timer_get_time() - splash_shown_us) / 1000;
-        int64_t remaining_ms = splash_min_ms - elapsed_ms;
-        if (remaining_ms > 0) {
-            ESP_LOGI(TAG, "splash hold: init took %lld ms, sleeping %lld ms "
-                          "more (target %lld ms)",
-                     (long long)elapsed_ms,
-                     (long long)remaining_ms,
-                     (long long)splash_min_ms);
-            vTaskDelay(pdMS_TO_TICKS(remaining_ms));
-        } else {
-            ESP_LOGI(TAG, "splash hold: init took %lld ms (≥ %lld ms target), "
-                          "no extra wait",
-                     (long long)elapsed_ms, (long long)splash_min_ms);
-        }
-        esp_err_t pfd_err = pk_pfd_start();
-        if (pfd_err != ESP_OK) {
-            ESP_LOGW(TAG, "PFD start failed (%s)", esp_err_to_name(pfd_err));
-        } else {
-            ESP_LOGI(TAG, "PFD render task running");
-        }
-    }
+    // if (lcd_err == ESP_OK) {
+        // const int64_t splash_min_ms = PK_BOOT_SPLASH_MIN_MS;
+        // int64_t elapsed_ms = (esp_timer_get_time() - splash_shown_us) / 1000;
+        // int64_t remaining_ms = splash_min_ms - elapsed_ms;
+        // if (remaining_ms > 0) {
+            // ESP_LOGI(TAG, "splash hold: init took %lld ms, sleeping %lld ms "
+                          // "more (target %lld ms)",
+                     // (long long)elapsed_ms,
+                     // (long long)remaining_ms,
+                     // (long long)splash_min_ms);
+            // vTaskDelay(pdMS_TO_TICKS(remaining_ms));
+        // } else {
+            // ESP_LOGI(TAG, "splash hold: init took %lld ms (≥ %lld ms target), "
+                          // "no extra wait",
+                     // (long long)elapsed_ms, (long long)splash_min_ms);
+        // }
+        // esp_err_t pfd_err = pk_pfd_start();
+        // if (pfd_err != ESP_OK) {
+            // ESP_LOGW(TAG, "PFD start failed (%s)", esp_err_to_name(pfd_err));
+        // } else {
+            // ESP_LOGI(TAG, "PFD render task running");
+        // }
+    // }
 
     /* BLE init. Requires the on-board ESP32-C6 to have been
      * pre-flashed with the matching esp_hosted slave firmware (one-time
