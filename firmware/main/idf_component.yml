@@ -3,10 +3,5 @@ dependencies:
   idf:
     version: '>=5.2.0'
   espressif/usb: '*'
-  # LittleFS — log-structured filesystem for the on-board ADS-B ts-format
-  # dump partition. Picked over SPIFFS for better wear levelling on the
-  # 32 MB Nor flash, which can see thousands of writes per flight hour
-  # (one CRC-valid Mode-S frame per ts-line).
-  joltwallet/littlefs: ^1.16.0
   espressif/esp_hosted: '*'
   espressif/esp_wifi_remote: '*'

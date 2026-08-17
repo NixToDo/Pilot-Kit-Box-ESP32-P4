@@ -13,7 +13,7 @@ typedef enum {
 typedef enum {
     PK_HDG_SRC_NONE = 0,
     PK_HDG_SRC_ADSB,         /* 绑定飞机 ADS-B 地面航迹(真北) */
-    PK_HDG_SRC_IMU,          /* IMU 磁航向 yaw(磁北, 机头朝向) */
+    //PK_HDG_SRC_IMU,          /* IMU 磁航向 yaw(磁北, 机头朝向) */
     PK_HDG_SRC_GPS,          /* GPS track 兜底(真北, 地速方向) */
 } pk_hdg_src_t;
 
@@ -34,5 +34,5 @@ bool pk_own_ship_resolve(int64_t now_us, int64_t max_age_us,
  * IMU 磁北) 与(可选)*out_src，返回 true 表示有有效航向。 */
 bool pk_own_heading_resolve(bool own_valid, pk_own_src_t own_src,
                             const aircraft_t *own,
-                            bool imu_valid, float imu_yaw_deg,
+                            //bool imu_valid, float imu_yaw_deg,
                             float *out_deg, pk_hdg_src_t *out_src);

@@ -57,7 +57,7 @@ void aircraft_state_init(void)
 static aircraft_t *lookup_or_claim(uint32_t icao24, int64_t now_us)
 {
     const uint32_t base     = icao24 % AIRCRAFT_TABLE_CAPACITY;
-    const uint32_t own_icao = pk_ui_get_own_icao();
+    const uint32_t own_icao = CONFIG_PK_OWN_ICAO; //pk_ui_get_own_icao();
     aircraft_t    *empty    = NULL;
     aircraft_t    *lru      = NULL;
 

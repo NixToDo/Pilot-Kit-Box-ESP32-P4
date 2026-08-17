@@ -27,7 +27,7 @@
 #include "aircraft_state.h"
 #include "geo.h"
 #include "own_ship.h"
-#include "imu_task.h"
+//#include "imu_task.h"
 #include "airline_codes.h"
 #include "display.h"
 #include "icao_country.h"
@@ -434,12 +434,12 @@ static void render_detail(uint16_t *fb, int detail_top_y,
     pk_own_src_t own_src;
     bool have_own = pk_own_ship_resolve(now_us, AIRCRAFT_STALE_AGE_US, &own, &own_src);
     /* 本机航向(箭头用)统一走 4 级优先级 ADS-B>IMU>GPS track。 */
-    pk_imu_sample_t imu_s;
-    bool imu_ok = pk_imu_sample_get(&imu_s);
+    //pk_imu_sample_t imu_s;
+    //bool imu_ok = false; //pk_imu_sample_get(&imu_s);
     float own_hdg_f; pk_hdg_src_t hsrc;
     bool have_own_hdg = pk_own_heading_resolve(
-        have_own, own_src, &own, imu_ok && imu_s.valid,
-        imu_ok ? imu_s.yaw_deg : 0.0f, &own_hdg_f, &hsrc);
+        have_own, own_src, &own, /*imu_ok && imu_s.valid,
+        imu_ok ? imu_s.yaw_deg : 0.0f,*/ &own_hdg_f, &hsrc);
     int own_hdg_deg = have_own_hdg ? (int)lroundf(own_hdg_f) : 0;
     (void)have_own;  /* used below for rel-alt / dist */
 
@@ -688,13 +688,13 @@ void pk_adsb_list_render(uint16_t *fb)
     bool       have_own   = pk_own_ship_resolve(now_us, AIRCRAFT_STALE_AGE_US,
                                                 &own, &own_src_list);
     /* 本机航向(每行 HDG 箭头用)统一走 4 级优先级 ADS-B>IMU>GPS track。 */
-    pk_imu_sample_t imu_s;
-    bool imu_ok = pk_imu_sample_get(&imu_s);
+    //pk_imu_sample_t imu_s;
+    //bool imu_ok = pk_imu_sample_get(&imu_s);
     pk_hdg_src_t hsrc_list;
     float own_hdg_f;
     bool have_own_velocity = pk_own_heading_resolve(
-        have_own, own_src_list, &own, imu_ok && imu_s.valid,
-        imu_ok ? imu_s.yaw_deg : 0.0f, &own_hdg_f, &hsrc_list);
+        have_own, own_src_list, &own, /*imu_ok && imu_s.valid,
+        imu_ok ? imu_s.yaw_deg : 0.0f,*/ &own_hdg_f, &hsrc_list);
     int  own_heading_deg   = have_own_velocity ? (int)lroundf(own_hdg_f) : 0;
 
     /* ----- Adaptive layout ---------------------------------------------

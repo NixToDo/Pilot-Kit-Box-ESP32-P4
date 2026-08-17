@@ -26,7 +26,7 @@
 #include "pilot_kit.h"
 #include "aircraft_db.h"
 #include "aircraft_state.h"
-#include "gps.h"
+//#include "gps.h"
 #include "ble_gatt.h"
 //#include "boot_splash.h"
 //#include "button_task.h"
@@ -37,10 +37,10 @@
 //#include "display.h"
 //#include "imu_task.h"
 //#include "baro.h"
-#include "i18n.h"
+//#include "i18n.h"
 //#include "pfd.h"
-#include "power.h"
-//#include "record_sink.h"
+//#include "power.h"
+#include "record_sink.h"
 //#include "settings_page.h"
 //#include "ui_state.h"
 
@@ -295,7 +295,7 @@ void app_main(void)
     /* Initialise the per-aircraft fusion table before any sink can write
      * into it. */
     aircraft_state_init();
-    pk_gps_start();   /* GT-U8 GPS on UART1 */
+    // pk_gps_start();   /* GT-U8 GPS on UART1 */
 
     /* Validate the embedded ICAO24 -> type/model/registration database
      * (aircraft_db.bin in .rodata). Bad header is non-fatal: lookups
@@ -316,9 +316,9 @@ void app_main(void)
     const char *file_mount = record_sinks_install_defaults();
     if (file_mount != NULL) {
         ESP_LOGI(TAG, "ADS-B sinks ready (UART)", file_mount);
-     } //else {
-        // ESP_LOGW(TAG, "ADS-B file sink unavailable — UART sink only");
-    // }
+    } else {
+        ESP_LOGW(TAG, "ADS-B file sink unavailable — UART sink only");
+    }
 
     ok = xTaskCreatePinnedToCore(sdr_task, "sdr", 8192, NULL, 6, NULL, 1);
     assert(ok == pdTRUE);
