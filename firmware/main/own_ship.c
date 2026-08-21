@@ -6,7 +6,7 @@
 bool pk_own_ship_resolve(int64_t now_us, int64_t max_age_us,
                          aircraft_t *out, pk_own_src_t *src){
     /* 1. Manual binding wins outright. */
-    uint32_t icao = pk_ui_get_own_icao();
+    uint32_t icao = (uint32_t)CONFIG_PK_OWN_ICAO; //pk_ui_get_own_icao();
     if(icao != 0 && aircraft_state_get_own(icao, now_us, max_age_us, out)){
         if(src) *src = PK_OWN_SRC_BOUND_ADSB;
         return true;

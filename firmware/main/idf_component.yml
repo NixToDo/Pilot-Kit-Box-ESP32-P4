@@ -3,5 +3,5 @@ dependencies:
   idf:
     version: '>=5.2.0'
   espressif/usb: '*'
-  espressif/esp_hosted: '*'
+  espressif/esp_hosted: '2.12.12'
   espressif/esp_wifi_remote: '*'
