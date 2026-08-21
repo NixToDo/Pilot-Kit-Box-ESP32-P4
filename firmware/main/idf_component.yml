@@ -8,5 +8,5 @@ dependencies:
   # 32 MB Nor flash, which can see thousands of writes per flight hour
   # (one CRC-valid Mode-S frame per ts-line).
   joltwallet/littlefs: ^1.16.0
-  espressif/esp_hosted: '*'
+  espressif/esp_hosted: '2.12.12'
   espressif/esp_wifi_remote: '*'
